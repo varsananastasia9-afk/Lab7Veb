@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Вхід | Реєстрація</title>
+    <link rel="stylesheet" href="Untitled-4.css">
+</head>
+
+<body>
+
+    <nav>
+        <h2><span class="Big-logo">Big</span> <span class="Dream-logo">Dream</span></h2>
+        <div>
+            <a href="Untitled-1.html">Головна</a>
+            <a href="Untitled-2.html">Меню</a>
+            <a href="Untitled-3.html">Кошик</a>
+            <a href="Untitled-4.html" class="active">Вхід</a>
+        </div>
+    </nav>
+
+    <div class="content">
+        <div class="auth-card">
+
+            <div class="tab-switcher">
+                <button class="tab active" onclick="switchTab('login', this)">Вхід</button>
+                <button class="tab" onclick="switchTab('register', this)">Реєстрація</button>
+            </div>
+
+            <div id="login-form">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="login-email" placeholder="your@email.com">
+                    <span class="field-hint" id="login-email-hint"></span>
+                </div>
+                <div class="form-group">
+                    <label>Пароль</label>
+                    <input type="password" id="login-password" placeholder="••••••••">
+                    <span class="field-hint" id="login-password-hint"></span>
+                </div>
+                <button class="submit-btn" onclick="handleLogin()">Увійти в акаунт</button>
+            </div>
+
+            <div id="register-form" style="display:none">
+                <div class="form-group">
+                    <label>Ім'я</label>
+                    <input type="text" id="reg-name" placeholder="Ваше ім'я">
+                    <span class="field-hint" id="reg-name-hint"></span>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="reg-email" placeholder="your@email.com">
+                    <span class="field-hint" id="reg-email-hint"></span>
+                </div>
+                <div class="form-group">
+                    <label>Пароль</label>
+                    <input type="password" id="reg-password" placeholder="Мінімум 8 символів">
+                    <span class="field-hint" id="reg-password-hint"></span>
+                </div>
+                <button class="submit-btn" onclick="handleRegister()">Зареєструватися</button>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            var user = null;
+            try { user = JSON.parse(localStorage.getItem('user_session')); } catch {}
+            if (user && user.name) {
+                var nav = document.querySelector('nav div');
+                var btn = document.createElement('button');
+                btn.textContent = 'Вийти (' + user.name + ')';
+                btn.style.cssText = 'font-size:13px;color:#999;background:none;border:none;cursor:pointer;padding:6px 12px;border-radius:8px;font-family:Inter,sans-serif';
+                btn.onmouseover = function(){ this.style.color='white'; this.style.background='#2a2a2a'; };
+                btn.onmouseout  = function(){ this.style.color='#999';  this.style.background='none'; };
+                btn.onclick = function() {
+                    localStorage.removeItem('user_session');
+                    location.reload();
+                };
+                nav.appendChild(btn);
+            }
+        })();
+
+        window.addEventListener('load', function() {
+            const card = document.querySelector('.auth-card');
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(24px)';
+            card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            setTimeout(function() {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 100);
+        });
+
+        function switchTab(tab, btn) {
+            document.querySelectorAll('.tab').forEach(function(t) {
+                t.classList.remove('active');
+            });
+            btn.classList.add('active');
+            document.getElementById('login-form').style.display = tab === 'login' ? 'block' : 'none';
+            document.getElementById('register-form').style.display = tab === 'register' ? 'block' : 'none';
+            clearHints();
+        }
+
+        function isValidEmail(email) {
+            const parts = email.split('@');
+            if (parts.length !== 2) return false;
+            if (parts[0].length === 0) return false;
+            if (!parts[1].includes('.')) return false;
+            if (parts[1].split('.').pop().length === 0) return false;
+            return true;
+        }
+
+        function showHint(id, message, isError) {
+            const hint = document.getElementById(id);
+            hint.textContent = message;
+            hint.classList.add('show');
+            hint.style.color = isError ? 'rgb(206, 116, 51)' : '#4CAF50';
+        }
+
+        function hideHint(id) {
+            const hint = document.getElementById(id);
+            hint.classList.remove('show');
+        }
+
+        function clearHints() {
+            document.querySelectorAll('.field-hint').forEach(function(h) {
+                h.classList.remove('show');
+                h.textContent = '';
+            });
+            document.querySelectorAll('input').forEach(function(input) {
+                input.style.borderColor = '';
+            });
+        }
+
+        function setInputError(inputId) {
+            document.getElementById(inputId).style.borderColor = 'rgba(206,116,51,0.6)';
+        }
+
+        function setInputOk(inputId) {
+            document.getElementById(inputId).style.borderColor = 'rgba(76,175,80,0.6)';
+        }
+
+        function handleLogin() {
+            clearHints();
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+            let hasError = false;
+
+            if (!email) {
+                showHint('login-email-hint', 'Введіть email', true);
+                setInputError('login-email');
+                hasError = true;
+            } else if (!isValidEmail(email)) {
+                showHint('login-email-hint', 'Невірний формат email', true);
+                setInputError('login-email');
+                hasError = true;
+            }
+
+            if (!password) {
+                showHint('login-password-hint', 'Введіть пароль', true);
+                setInputError('login-password');
+                hasError = true;
+            }
+
+            if (hasError) return;
+            const adminCreds = JSON.parse(localStorage.getItem('admin_creds') || 'null')
+                || { email: 'admin@bigdream.com', password: 'admin1234' };
+            if (email === adminCreds.email && password === adminCreds.password) {
+                localStorage.setItem('admin_session', JSON.stringify({ email: email, ts: Date.now() }));
+                showHint('login-password-hint', 'Вхід як адміністратор. Переходимо...', false);
+                setInputOk('login-email');
+                setInputOk('login-password');
+                setTimeout(function() { window.location.href = 'admin.html'; }, 800);
+                return;
+            }
+
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const user = users.find(function(u) { return u.email === email; });
+
+            if (!user) {
+                showHint('login-email-hint', 'Акаунт з таким email не існує', true);
+                setInputError('login-email');
+                return;
+            }
+
+            if (user.password !== password) {
+                showHint('login-password-hint', 'Невірний пароль', true);
+                setInputError('login-password');
+                return;
+            }
+
+            localStorage.setItem('user_session', JSON.stringify({ name: user.name, email: user.email }));
+            showHint('login-password-hint', 'Вхід успішний! Ласкаво просимо, ' + user.name + '!', false);
+            setInputOk('login-email');
+            setInputOk('login-password');
+        }
+
+        function handleRegister() {
+            clearHints();
+            const name = document.getElementById('reg-name').value.trim();
+            const email = document.getElementById('reg-email').value.trim();
+            const password = document.getElementById('reg-password').value;
+            let hasError = false;
+
+            if (!name) {
+                showHint('reg-name-hint', "Введіть ваше ім'я", true);
+                setInputError('reg-name');
+                hasError = true;
+            }
+
+            if (!email) {
+                showHint('reg-email-hint', 'Введіть email', true);
+                setInputError('reg-email');
+                hasError = true;
+            } else if (!isValidEmail(email)) {
+                showHint('reg-email-hint', 'Невірний формат email', true);
+                setInputError('reg-email');
+                hasError = true;
+            }
+
+            if (!password) {
+                showHint('reg-password-hint', 'Введіть пароль', true);
+                setInputError('reg-password');
+                hasError = true;
+            } else if (password.length < 8) {
+                showHint('reg-password-hint', 'Пароль має бути мінімум 8 символів', true);
+                setInputError('reg-password');
+                hasError = true;
+            }
+
+            if (hasError) return;
+
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const exists = users.find(function(u) { return u.email === email; });
+
+            if (exists) {
+                showHint('reg-email-hint', 'Акаунт з таким email вже існує', true);
+                setInputError('reg-email');
+                return;
+            }
+
+            users.push({ name: name, email: email, password: password });
+            localStorage.setItem('users', JSON.stringify(users));
+
+            showHint('reg-password-hint', 'Реєстрацію завершено! Тепер увійдіть в акаунт', false);
+            setInputOk('reg-name');
+            setInputOk('reg-email');
+            setInputOk('reg-password');
+        }
+    </script>
+
+</body>
+</html>

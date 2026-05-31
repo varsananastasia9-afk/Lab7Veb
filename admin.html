@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="utf-8">
+    <title>Адмін-панель | Big Dream</title>
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<div id="access-gate">
+    <div class="gate-card">
+        <div class="gate-logo">
+            <span style="color:white">Big</span> <span style="color:rgb(206,116,51)">Dream</span>
+        </div>
+        <div class="gate-sub">Адміністративна панель</div>
+
+        <div class="gate-form">
+            <div class="form-group">
+                <label>Email адміністратора</label>
+                <input type="email" id="gate-email" placeholder="admin@bigdream.com" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label>Пароль</label>
+                <input type="password" id="gate-password" placeholder="••••••••">
+            </div>
+            <div class="gate-error" id="gate-error"></div>
+            <button class="btn btn-primary" style="width:100%;margin-top:8px" onclick="gateLogin()">
+                Увійти в панель
+            </button>
+        </div>
+        <p style="font-size:11px;color:#555;margin-top:20px">
+            Демо: admin@bigdream.com / admin1234
+        </p>
+    </div>
+</div>
+
+<div id="admin-app" style="display:none">
+
+    <nav class="topnav">
+        <div class="topnav-left">
+            <div class="logo"><span>Big</span> <span>Dream</span></div>
+            <span class="admin-badge">Admin</span>
+        </div>
+        <div class="topnav-right">
+            <span class="admin-user" id="topnav-user">— </span>
+            <a href="Untitled-1.html" class="back-link">← На сайт</a>
+            <button class="btn btn-ghost btn-sm" onclick="adminLogout()">Вийти</button>
+        </div>
+    </nav>
+
+    <div class="layout">
+
+        <aside class="sidebar">
+            <span class="sidebar-section-label">Головне</span>
+            <button class="sidebar-btn active" onclick="showPage('dashboard', this)">
+                <span class="icon">◈</span> Дашборд
+            </button>
+
+            <span class="sidebar-section-label">Контент</span>
+            <button class="sidebar-btn" onclick="showPage('menu', this)">
+                <span class="icon">◉</span> Меню
+            </button>
+            <button class="sidebar-btn" onclick="showPage('categories', this)">
+                <span class="icon">◧</span> Категорії
+            </button>
+
+            <span class="sidebar-section-label">Операції</span>
+            <button class="sidebar-btn" onclick="showPage('orders', this)">
+                <span class="icon">◎</span> Замовлення
+            </button>
+            <button class="sidebar-btn" onclick="showPage('users', this)">
+                <span class="icon">◑</span> Користувачі
+            </button>
+
+            <span class="sidebar-section-label">Система</span>
+            <button class="sidebar-btn" onclick="showPage('reviews', this)">
+                <span class="icon">◇</span> Відгуки
+            </button>
+            <button class="sidebar-btn" onclick="showPage('settings', this)">
+                <span class="icon">◌</span> Налаштування
+            </button>
+        </aside>
+
+        <main class="main">
+
+            <div id="page-dashboard" class="page active">
+                <div class="page-title">Дашборд</div>
+                <div class="page-desc">Загальний огляд ресторану Big Dream</div>
+
+                <div class="stat-grid" id="stat-grid"></div>
+
+                <div class="overview-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">Останні замовлення</span>
+                            <button class="btn btn-ghost btn-sm" onclick="showPage('orders', document.querySelector('[onclick*=orders]'))">Всі →</button>
+                        </div>
+                        <div id="dash-orders"></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">Останні реєстрації</span>
+                            <button class="btn btn-ghost btn-sm" onclick="showPage('users', document.querySelector('[onclick*=users]'))">Всі →</button>
+                        </div>
+                        <div id="dash-users"></div>
+                    </div>
+                    <div class="card" style="grid-column:1/-1">
+                        <div class="card-header"><span class="card-title">Стрічка активності</span></div>
+                        <div class="activity-list" id="activity-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-menu" class="page">
+                <div class="section-header">
+                    <div>
+                        <div class="page-title">Управління меню</div>
+                        <div class="page-desc">Додавайте, редагуйте та видаляйте страви</div>
+                    </div>
+                    <button class="btn btn-accent" onclick="openDishModal()">+ Додати страву</button>
+                </div>
+
+                <div class="search-bar">
+                    <input class="search-input" id="menu-search" placeholder="Пошук страви..." oninput="renderMenuTable()">
+                    <select class="search-input" style="max-width:160px" id="menu-filter-cat" onchange="renderMenuTable()">
+                        <option value="">Всі категорії</option>
+                    </select>
+                </div>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Назва</th>
+                                <th>Категорія</th>
+                                <th>Підкатегорія</th>
+                                <th>Ціна</th>
+                                <th>Статус</th>
+                                <th>Дії</th>
+                            </tr>
+                        </thead>
+                        <tbody id="menu-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="page-categories" class="page">
+                <div class="section-header">
+                    <div>
+                        <div class="page-title">Категорії меню</div>
+                        <div class="page-desc">Структура розділів меню</div>
+                    </div>
+                    <button class="btn btn-accent" onclick="openCatModal()">+ Додати категорію</button>
+                </div>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Назва категорії</th>
+                                <th>Підкатегорії</th>
+                                <th>Страв</th>
+                                <th>Дії</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cat-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="page-orders" class="page">
+                <div class="section-header">
+                    <div>
+                        <div class="page-title">Замовлення</div>
+                        <div class="page-desc">Всі оформлені замовлення клієнтів</div>
+                    </div>
+                    <button class="btn btn-ghost" onclick="clearOrders()">Очистити архів</button>
+                </div>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>№ замовлення</th>
+                                <th>Дата і час</th>
+                                <th>Позиції</th>
+                                <th>Сума</th>
+                                <th>Статус</th>
+                                <th>Дії</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orders-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="page-users" class="page">
+                <div class="section-header">
+                    <div>
+                        <div class="page-title">Користувачі</div>
+                        <div class="page-desc">Зареєстровані акаунти клієнтів</div>
+                    </div>
+                </div>
+
+                <div class="search-bar">
+                    <input class="search-input" id="users-search" placeholder="Пошук за іменем або email..." oninput="renderUsersTable()">
+                </div>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Ім'я</th>
+                                <th>Email</th>
+                                <th>Дата реєстрації</th>
+                                <th>Роль</th>
+                                <th>Дії</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="page-reviews" class="page">
+                <div class="section-header">
+                    <div>
+                        <div class="page-title">Відгуки</div>
+                        <div class="page-desc">Керування відгуками клієнтів</div>
+                    </div>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Страва</th>
+                                <th>Клієнт</th>
+                                <th>Оцінка</th>
+                                <th>Відгук</th>
+                                <th>Дата</th>
+                                <th>Дії</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reviews-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="page-settings" class="page">
+                <div class="page-title">Налаштування</div>
+                <div class="page-desc">Конфігурація сайту та адміністратора</div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:800px">
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">Інформація про ресторан</span></div>
+                        <div style="padding:16px;display:flex;flex-direction:column;gap:12px">
+                            <div class="form-group" style="margin:0">
+                                <label>Назва ресторану</label>
+                                <input type="text" id="set-name" value="Big Dream">
+                            </div>
+                            <div class="form-group" style="margin:0">
+                                <label>Адреса</label>
+                                <input type="text" id="set-address" value="м. Південне, вул. Приморська, 15">
+                            </div>
+                            <div class="form-group" style="margin:0">
+                                <label>Телефон</label>
+                                <input type="text" id="set-phone" value="+380 63 223 75 60">
+                            </div>
+                            <div class="form-group" style="margin:0">
+                                <label>Email</label>
+                                <input type="text" id="set-email" value="bigdream.restaurant@gmail.com">
+                            </div>
+                            <div class="form-group" style="margin:0">
+                                <label>Години роботи</label>
+                                <input type="text" id="set-hours" value="Пн–Нд: 10:00–22:00">
+                            </div>
+                            <button class="btn btn-primary" onclick="saveSettings()">Зберегти зміни</button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">Облікові дані адміна</span></div>
+                        <div style="padding:16px;display:flex;flex-direction:column;gap:12px">
+                            <div class="form-group" style="margin:0">
+                                <label>Email адміна</label>
+                                <input type="email" id="set-admin-email" placeholder="admin@bigdream.com">
+                            </div>
+                            <div class="form-group" style="margin:0">
+                                <label>Новий пароль</label>
+                                <input type="password" id="set-admin-pass" placeholder="Мінімум 8 символів">
+                            </div>
+                            <div class="form-group" style="margin:0">
+                                <label>Підтвердження пароля</label>
+                                <input type="password" id="set-admin-pass2" placeholder="Повторіть пароль">
+                            </div>
+                            <button class="btn btn-primary" onclick="changeAdminCreds()">Змінити дані</button>
+                        </div>
+                    </div>
+
+                    <div class="card" style="grid-column:1/-1">
+                        <div class="card-header"><span class="card-title">Небезпечна зона</span></div>
+                        <div style="padding:16px;display:flex;gap:10px;flex-wrap:wrap">
+                            <button class="btn btn-danger" onclick="resetAllOrders()">Скинути всі замовлення</button>
+                            <button class="btn btn-danger" onclick="resetAllUsers()">Видалити всіх користувачів</button>
+                            <button class="btn btn-danger" onclick="resetMenuToDefault()">Скинути меню до початкового</button>
+                            <button class="btn btn-danger" onclick="resetAllData()">Повне скидання даних</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<div class="modal-overlay" id="dish-modal">
+    <div class="modal">
+        <div class="modal-title" id="dish-modal-title">Нова страва</div>
+        <input type="hidden" id="dish-edit-id">
+        <div class="form-row">
+            <div class="form-group">
+                <label>Назва страви</label>
+                <input type="text" id="dish-name" placeholder="Карбонара">
+            </div>
+            <div class="form-group">
+                <label>Ціна (грн)</label>
+                <input type="number" id="dish-price" placeholder="189">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Опис</label>
+            <input type="text" id="dish-desc" placeholder="Паста, яйце, бекон...">
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Категорія</label>
+                <select id="dish-cat" onchange="updateSubcatSelect()">
+                    <option value="">Оберіть...</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Підкатегорія</label>
+                <select id="dish-subcat">
+                    <option value="">Оберіть...</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Статус</label>
+                <select id="dish-status">
+                    <option value="active">Активна</option>
+                    <option value="hidden">Прихована</option>
+                    <option value="out">Немає в наявності</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Зображення (ім'я файлу)</label>
+                <input type="text" id="dish-img" placeholder="pasta.jpg">
+            </div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-ghost" onclick="closeModal('dish-modal')">Скасувати</button>
+            <button class="btn btn-accent" onclick="saveDish()">Зберегти</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="cat-modal">
+    <div class="modal">
+        <div class="modal-title" id="cat-modal-title">Нова категорія</div>
+        <input type="hidden" id="cat-edit-id">
+        <div class="form-group">
+            <label>Назва категорії</label>
+            <input type="text" id="cat-name" placeholder="Європейська кухня">
+        </div>
+        <div class="form-group">
+            <label>Підкатегорії (через кому)</label>
+            <input type="text" id="cat-subs" placeholder="Паста, Біфштекси, Шніцель">
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-ghost" onclick="closeModal('cat-modal')">Скасувати</button>
+            <button class="btn btn-accent" onclick="saveCat()">Зберегти</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="confirm-modal">
+    <div class="modal" style="max-width:360px">
+        <div class="modal-title">Підтвердження</div>
+        <p class="confirm-text" id="confirm-text">Ви впевнені?</p>
+        <p class="confirm-name" id="confirm-name"></p>
+        <div class="modal-actions">
+            <button class="btn btn-ghost" onclick="closeModal('confirm-modal')">Скасувати</button>
+            <button class="btn btn-danger" id="confirm-ok-btn">Видалити</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="order-modal">
+    <div class="modal">
+        <div class="modal-title" id="order-modal-title">Деталі замовлення</div>
+        <div id="order-modal-body"></div>
+        <div class="modal-actions">
+            <button class="btn btn-ghost" onclick="closeModal('order-modal')">Закрити</button>
+            <button class="btn btn-accent" id="order-status-btn">Змінити статус</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal-overlay" id="reply-modal">
+    <div class="modal" style="max-width:420px">
+        <div class="modal-title">Відповідь на відгук</div>
+        <input type="hidden" id="reply-dish-id">
+        <input type="hidden" id="reply-review-email">
+        <div class="form-group">
+            <label>Відгук клієнта</label>
+            <div id="reply-original" style="font-size:13px;color:#999;background:#1a1a1a;padding:10px 12px;border-radius:8px;line-height:1.5"></div>
+        </div>
+        <div class="form-group">
+            <label>Ваша відповідь</label>
+            <textarea id="reply-text" class="form-group" style="width:100%;min-height:80px;padding:9px 12px;font-size:13px;background:#1e1e1e;border:0.5px solid rgba(255,255,255,0.14);border-radius:8px;color:white;font-family:Inter,sans-serif;outline:none;box-sizing:border-box;resize:none" placeholder="Введіть відповідь..."></textarea>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-ghost" onclick="closeModal('reply-modal')">Скасувати</button>
+            <button class="btn btn-accent" onclick="saveReply()">Відповісти</button>
+        </div>
+    </div>
+</div>
+
+<script>
+'use strict';
+
+const ADMIN_CREDENTIALS = { email: 'admin@bigdream.com', password: 'admin1234' };
+
+const DEFAULT_CATEGORIES = [
+    { id: 1, name: 'Європейська кухня',   subs: ['Паста', 'Біфштекси', 'Шніцель'] },
+    { id: 2, name: 'Азійська кухня',      subs: ['Суші', 'Каррі'] },
+    { id: 3, name: 'Алкогольні напої',    subs: ['Вино', 'Пиво', 'Віскі'] },
+    { id: 4, name: 'Безалкогольні напої', subs: ['Чай', 'Кава', 'Лимонад'] }
+];
+
+const DEFAULT_DISHES = [
+    // Європейська — Паста
+    { id: 1,  name: 'Карбонара',              desc: 'Паста, яйце, бекон, сир, вершки',                price: 189, cat: 'Європейська кухня',    subcat: 'Паста',     img: 'pasta-karbonara.jpg',       status: 'active' },
+    { id: 2,  name: 'Болоньєзе',              desc: 'Паста, фарш, томатний соус, овочі',              price: 175, cat: 'Європейська кухня',    subcat: 'Паста',     img: 'balioneze.jpg',             status: 'active' },
+    { id: 3,  name: 'Феттучіні Альфредо',     desc: 'Паста, вершки, масло, сир',                     price: 195, cat: 'Європейська кухня',    subcat: 'Паста',     img: 'Fettuchinne.jpeg',          status: 'active' },
+    // Європейська — Біфштекси
+    { id: 4,  name: 'Біфштекс класичний',     desc: 'Яловичина, картопляне пюре',                    price: 320, cat: 'Європейська кухня',    subcat: 'Біфштекси', img: 'steak obichniy.png',        status: 'active' },
+    { id: 5,  name: 'Біфштекс грибний',       desc: 'Яловичина, гриби, вершки',                      price: 345, cat: 'Європейська кухня',    subcat: 'Біфштекси', img: 'gribu_Steak.jpg',           status: 'active' },
+    { id: 6,  name: 'Біфштекс по-бургундськи',desc: 'Яловичина, вино, овочі',                        price: 365, cat: 'Європейська кухня',    subcat: 'Біфштекси', img: 'steak_Burgudski.jpg',       status: 'active' },
+    // Європейська — Шніцель
+    { id: 7,  name: 'Шніцель з яловичини',    desc: 'Яловичий фарш, цибуля, яйце, хліб, спеції',    price: 280, cat: 'Європейська кухня',    subcat: 'Шніцель',   img: 'snicel_yalovuchuna.jpg',    status: 'active' },
+    { id: 8,  name: 'Шніцель зі свинини',     desc: 'Свинина, сухарі, спеції',                       price: 255, cat: 'Європейська кухня',    subcat: 'Шніцель',   img: 'snicel_pig.jpg',            status: 'active' },
+    { id: 9,  name: 'Шніцель курячий',        desc: 'Курка, панірування, яйце',                      price: 235, cat: 'Європейська кухня',    subcat: 'Шніцель',   img: 'shnitsel_kyrica.jpg',       status: 'active' },
+    // Азійська — Суші
+    { id: 10, name: 'Каліфорнія з креветкою', desc: 'Рис, краб, авокадо, огірок, креветка',          price: 210, cat: 'Азійська кухня',       subcat: 'Суші',      img: 'kalif_krevetka.jpeg',       status: 'active' },
+    { id: 11, name: 'Філадельфія',             desc: 'Рис, лосось, сир, огірок',                      price: 225, cat: 'Азійська кухня',       subcat: 'Суші',      img: 'philadelphia.jpg',          status: 'active' },
+    { id: 12, name: 'Нігірі з тунцем',        desc: 'Рис, тунець',                                   price: 195, cat: 'Азійська кухня',       subcat: 'Суші',      img: 'nuguru_tunec.jpeg',         status: 'active' },
+    // Азійська — Каррі
+    { id: 13, name: 'Зелений тайський',        desc: 'Курка, кокосове молоко, спеції',                price: 245, cat: 'Азійська кухня',       subcat: 'Каррі',     img: 'зелений каррі.jpg',        status: 'active' },
+    { id: 14, name: 'Червоний тайський',       desc: "М'ясо, паста каррі, овочі",                    price: 255, cat: 'Азійська кухня',       subcat: 'Каррі',     img: 'karri_red.jpg',             status: 'active' },
+    { id: 15, name: 'Індійський курячий',      desc: 'Курка, спеції, томати',                         price: 240, cat: 'Азійська кухня',       subcat: 'Каррі',     img: 'каррі з індійський.jpg',   status: 'active' },
+    // Алкогольні — Вино
+    { id: 16, name: 'Червоне Каберне',         desc: '',                                              price: 185, cat: 'Алкогольні напої',     subcat: 'Вино',      img: 'Cabernet_vine.jpg',         status: 'active' },
+    { id: 17, name: 'Біле Шардоне',            desc: '',                                              price: 175, cat: 'Алкогольні напої',     subcat: 'Вино',      img: 'shardone.jpg',              status: 'active' },
+    { id: 18, name: 'Ігристе Просекко',        desc: '',                                              price: 195, cat: 'Алкогольні напої',     subcat: 'Вино',      img: 'ігристе.png',              status: 'active' },
+    // Алкогольні — Пиво
+    { id: 19, name: 'Лагер',                   desc: '',                                              price: 75,  cat: 'Алкогольні напої',     subcat: 'Пиво',      img: 'lager.jpg',                 status: 'active' },
+    { id: 20, name: 'Ель',                     desc: '',                                              price: 85,  cat: 'Алкогольні напої',     subcat: 'Пиво',      img: 'el.jpg',                    status: 'active' },
+    { id: 21, name: 'Стаут',                   desc: '',                                              price: 90,  cat: 'Алкогольні напої',     subcat: 'Пиво',      img: 'beer 12.4.14_001a.jpg',     status: 'active' },
+    // Алкогольні — Віскі
+    { id: 22, name: 'Скотч',                   desc: '',                                              price: 145, cat: 'Алкогольні напої',     subcat: 'Віскі',     img: 'scotch.jpg',                status: 'active' },
+    { id: 23, name: 'Бурбон',                  desc: '',                                              price: 155, cat: 'Алкогольні напої',     subcat: 'Віскі',     img: 'бурбон.jpg',               status: 'active' },
+    { id: 24, name: 'Ірландський',             desc: '',                                              price: 150, cat: 'Алкогольні напої',     subcat: 'Віскі',     img: 'виски.jpg',                 status: 'active' },
+    // Безалкогольні — Чай
+    { id: 25, name: 'Зелений чай',             desc: '',                                              price: 55,  cat: 'Безалкогольні напої',  subcat: 'Чай',       img: 'чай зелений.jpg',          status: 'active' },
+    { id: 26, name: 'Чорний чай',              desc: '',                                              price: 50,  cat: 'Безалкогольні напої',  subcat: 'Чай',       img: 'чорний чай.jpg',           status: 'active' },
+    { id: 27, name: "Трав'яний чай",           desc: '',                                              price: 60,  cat: 'Безалкогольні напої',  subcat: 'Чай',       img: "трав'яний чай.jpg",        status: 'active' },
+    // Безалкогольні — Кава
+    { id: 28, name: 'Еспресо',                 desc: '',                                              price: 65,  cat: 'Безалкогольні напої',  subcat: 'Кава',      img: 'еспресо.jpg',              status: 'active' },
+    { id: 29, name: 'Латте',                   desc: '',                                              price: 85,  cat: 'Безалкогольні напої',  subcat: 'Кава',      img: 'латте.jpg',                status: 'active' },
+    { id: 30, name: 'Капучино',                desc: '',                                              price: 80,  cat: 'Безалкогольні напої',  subcat: 'Кава',      img: 'капучино.jpg',             status: 'active' },
+    // Безалкогольні — Лимонад
+    { id: 31, name: 'Класичний лимонад',       desc: 'Вода, лимон, цукор',                           price: 70,  cat: 'Безалкогольні напої',  subcat: 'Лимонад',   img: 'звичайний лимонад.jpg',    status: 'active' },
+    { id: 32, name: 'Полуничний лимонад',      desc: 'Полуниця, вода, цукор',                        price: 75,  cat: 'Безалкогольні напої',  subcat: 'Лимонад',   img: 'лимонад полуниця.jpg',     status: 'active' },
+    { id: 33, name: "М'ятний лимонад",         desc: "М'ята, лимон, вода",                           price: 75,  cat: 'Безалкогольні напої',  subcat: 'Лимонад',   img: "Лимонад м'ятний.jpg",      status: 'active' }
+];
+
+function ls(key, def) {
+    try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; }
+    catch { return def; }
+}
+function lsSet(key, val) { localStorage.setItem(key, JSON.stringify(val)); }
+
+function initData() {
+    if (!localStorage.getItem('admin_dishes')) lsSet('admin_dishes', DEFAULT_DISHES);
+    if (!localStorage.getItem('admin_categories')) lsSet('admin_categories', DEFAULT_CATEGORIES);
+    if (!localStorage.getItem('admin_orders')) lsSet('admin_orders', generateDemoOrders());
+    if (!localStorage.getItem('admin_creds')) lsSet('admin_creds', ADMIN_CREDENTIALS);
+    if (!localStorage.getItem('admin_settings')) lsSet('admin_settings', {
+        name: 'Big Dream',
+        address: 'м. Південне, вул. Приморська, 15',
+        phone: '+380 63 223 75 60',
+        email: 'bigdream.restaurant@gmail.com',
+        hours: 'Пн–Нд: 10:00–22:00'
+    });
+}
+
+function generateDemoOrders() {
+    const statuses = ['new', 'confirmed', 'cooking', 'delivered', 'cancelled'];
+    const items = [
+        [{ name: 'Карбонара', price: 189, qty: 2 }, { name: 'Латте', price: 85, qty: 1 }],
+        [{ name: 'Філадельфія', price: 225, qty: 3 }],
+        [{ name: 'Біфштекс класичний', price: 320, qty: 1 }, { name: 'Скотч', price: 145, qty: 2 }],
+        [{ name: 'Шніцель курячий', price: 235, qty: 2 }, { name: 'Еспресо', price: 65, qty: 2 }],
+        [{ name: 'Каліфорнія з креветкою', price: 210, qty: 4 }]
+    ];
+    const now = Date.now();
+    return items.map(function(itms, i) {
+        const total = itms.reduce(function(s, it) { return s + it.price * it.qty; }, 0);
+        return {
+            id: 1000 + i + 1,
+            items: itms,
+            total: total,
+            status: statuses[i],
+            date: new Date(now - (i * 3600000 * 8)).toISOString()
+        };
+    });
+}
+
+function gateLogin() {
+    const email = document.getElementById('gate-email').value.trim();
+    const pass = document.getElementById('gate-password').value;
+    const creds = ls('admin_creds', ADMIN_CREDENTIALS);
+    const err = document.getElementById('gate-error');
+
+    if (email === creds.email && pass === creds.password) {
+        lsSet('admin_session', { email: email, ts: Date.now() });
+        document.getElementById('access-gate').style.display = 'none';
+        document.getElementById('admin-app').style.display = 'block';
+        document.getElementById('topnav-user').textContent = email;
+        addActivity('Адмін увійшов у панель', 'accent');
+        renderAll();
+    } else {
+        err.textContent = 'Невірний email або пароль';
+        document.getElementById('gate-password').style.borderColor = 'rgba(224,85,85,0.5)';
+    }
+}
+
+function adminLogout() {
+    localStorage.removeItem('admin_session');
+    document.getElementById('admin-app').style.display = 'none';
+    document.getElementById('access-gate').style.display = 'flex';
+    document.getElementById('gate-error').textContent = '';
+    document.getElementById('gate-password').value = '';
+}
+
+document.getElementById('gate-password').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') gateLogin();
+});
+
+function showPage(id, btn) {
+    document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+    document.getElementById('page-' + id).classList.add('active');
+    document.querySelectorAll('.sidebar-btn').forEach(function(b) { b.classList.remove('active'); });
+    if (btn) btn.classList.add('active');
+    if (id === 'menu') { renderMenuTable(); populateCatSelects(); }
+    if (id === 'categories') renderCatTable();
+    if (id === 'orders') renderOrdersTable();
+    if (id === 'users') renderUsersTable();
+    if (id === 'dashboard') renderDashboard();
+    if (id === 'settings') loadSettingsForm();
+    if (id === 'reviews') renderReviewsTable();
+}
+
+function loadSettingsForm() {
+    var s = ls('admin_settings', {});
+    if (s.name)    document.getElementById('set-name').value    = s.name;
+    if (s.address) document.getElementById('set-address').value = s.address;
+    if (s.phone)   document.getElementById('set-phone').value   = s.phone;
+    if (s.email)   document.getElementById('set-email').value   = s.email;
+    if (s.hours)   document.getElementById('set-hours').value   = s.hours;
+}
+
+function renderAll() {
+    renderDashboard();
+    renderMenuTable();
+    renderCatTable();
+    renderOrdersTable();
+    renderUsersTable();
+    populateCatSelects();
+}
+
+function renderDashboard() {
+    const dishes = ls('admin_dishes', []);
+    const categories = ls('admin_categories', []);
+    const orders = ls('admin_orders', []);
+    const users = ls('users', []);
+    const revenue = orders.reduce(function(s, o) { return s + (o.status !== 'cancelled' ? o.total : 0); }, 0);
+    const newOrders = orders.filter(function(o) { return o.status === 'new'; }).length;
+
+    const stats = [
+        { label: 'Страв у меню', value: dishes.length, sub: 'активних: ' + dishes.filter(function(d) { return d.status === 'active'; }).length, accent: false },
+        { label: 'Замовлень', value: orders.length, sub: 'нових: ' + newOrders, accent: newOrders > 0 },
+        { label: 'Користувачів', value: users.length, sub: 'зареєстровано', accent: false },
+        { label: 'Дохід (грн)', value: revenue.toLocaleString('uk'), sub: 'без скасованих', accent: true }
+    ];
+
+    document.getElementById('stat-grid').innerHTML = stats.map(function(s) {
+        return '<div class="stat-card">' +
+            '<div class="stat-label">' + s.label + '</div>' +
+            '<div class="stat-value' + (s.accent ? ' stat-accent' : '') + '">' + s.value + '</div>' +
+            '<div class="stat-sub">' + s.sub + '</div>' +
+            '</div>';
+    }).join('');
+
+    const recentOrders = orders.slice(-5).reverse();
+    document.getElementById('dash-orders').innerHTML = recentOrders.length ? recentOrders.map(function(o) {
+        return '<div class="activity-item">' +
+            '<span>№ ' + o.id + '</span>' +
+            '<span style="flex:1;padding-left:12px;color:#999;font-size:12px">' + o.items.length + ' позицій</span>' +
+            '<span class="badge ' + statusBadge(o.status) + '">' + statusLabel(o.status) + '</span>' +
+            '<span class="activity-time">' + fmtDate(o.date) + '</span>' +
+            '</div>';
+    }).join('') : '<div class="empty-table">Замовлень поки немає</div>';
+
+    const recentUsers = users.slice(-5).reverse();
+    document.getElementById('dash-users').innerHTML = recentUsers.length ? recentUsers.map(function(u) {
+        return '<div class="activity-item">' +
+            '<span>' + u.name + '</span>' +
+            '<span style="flex:1;padding-left:12px;color:#999;font-size:12px">' + u.email + '</span>' +
+            '</div>';
+    }).join('') : '<div class="empty-table">Користувачів поки немає</div>';
+}
+
+function addActivity(msg, type) {
+    const log = ls('admin_activity', []);
+    log.unshift({ msg: msg, type: type || 'green', time: new Date().toISOString() });
+    if (log.length > 30) log.pop();
+    lsSet('admin_activity', log);
+    renderActivityList();
+}
+
+function renderActivityList() {
+    const log = ls('admin_activity', []);
+    const colors = { green: '#4caf50', accent: 'rgb(206,116,51)', red: '#e05555', blue: '#5b8dee' };
+    const el = document.getElementById('activity-list');
+    if (!el) return;
+    el.innerHTML = log.length ? log.map(function(item) {
+        return '<div class="activity-item">' +
+            '<div class="activity-dot" style="background:' + (colors[item.type] || '#555') + '"></div>' +
+            '<span>' + item.msg + '</span>' +
+            '<span class="activity-time">' + fmtDate(item.time) + '</span>' +
+            '</div>';
+    }).join('') : '<div class="empty-table">Активності немає</div>';
+}
+
+function renderMenuTable() {
+    const dishes = ls('admin_dishes', []);
+    const q = (document.getElementById('menu-search') || {}).value || '';
+    const cat = (document.getElementById('menu-filter-cat') || {}).value || '';
+    const filtered = dishes.filter(function(d) {
+        const matchQ = !q || d.name.toLowerCase().includes(q.toLowerCase());
+        const matchCat = !cat || d.cat === cat;
+        return matchQ && matchCat;
+    });
+
+    document.getElementById('menu-tbody').innerHTML = filtered.length ? filtered.map(function(d, i) {
+        return '<tr>' +
+            '<td class="td-muted">' + (i + 1) + '</td>' +
+            '<td><strong>' + d.name + '</strong>' + (d.desc ? '<div style="font-size:11px;color:#555;margin-top:2px">' + d.desc + '</div>' : '') + '</td>' +
+            '<td>' + d.cat + '</td>' +
+            '<td class="td-muted">' + d.subcat + '</td>' +
+            '<td class="td-accent">' + d.price + ' грн</td>' +
+            '<td><span class="badge ' + statusDishBadge(d.status) + '">' + statusDishLabel(d.status) + '</span></td>' +
+            '<td style="display:flex;gap:6px">' +
+                '<button class="btn btn-ghost btn-sm" onclick="openDishModal(' + d.id + ')">Ред.</button>' +
+                '<button class="btn btn-danger btn-sm" onclick="confirmDelete(\'dish\',' + d.id + ',\'' + esc(d.name) + '\')">Видал.</button>' +
+            '</td>' +
+            '</tr>';
+    }).join('') : '<tr><td colspan="7" class="empty-table">Страв не знайдено</td></tr>';
+}
+
+function populateCatSelects() {
+    const cats = ls('admin_categories', []);
+
+    const filterSel = document.getElementById('menu-filter-cat');
+    if (filterSel) {
+        const cur = filterSel.value;
+        filterSel.innerHTML = '<option value="">Всі категорії</option>' +
+            cats.map(function(c) { return '<option value="' + esc(c.name) + '"' + (cur === c.name ? ' selected' : '') + '>' + c.name + '</option>'; }).join('');
+    }
+
+    const dishCat = document.getElementById('dish-cat');
+    if (dishCat) {
+        const cur = dishCat.value;
+        dishCat.innerHTML = '<option value="">Оберіть...</option>' +
+            cats.map(function(c) { return '<option value="' + esc(c.name) + '"' + (cur === c.name ? ' selected' : '') + '>' + c.name + '</option>'; }).join('');
+        updateSubcatSelect();
+    }
+}
+
+function updateSubcatSelect() {
+    const cats = ls('admin_categories', []);
+    const catName = document.getElementById('dish-cat').value;
+    const cat = cats.find(function(c) { return c.name === catName; });
+    const sel = document.getElementById('dish-subcat');
+    sel.innerHTML = '<option value="">Оберіть...</option>' +
+        (cat ? cat.subs.map(function(s) { return '<option value="' + esc(s) + '">' + s + '</option>'; }).join('') : '');
+}
+
+function openDishModal(id) {
+    document.getElementById('dish-modal-title').textContent = id ? 'Редагувати страву' : 'Нова страва';
+    document.getElementById('dish-edit-id').value = id || '';
+    populateCatSelects();
+
+    if (id) {
+        const dish = ls('admin_dishes', []).find(function(d) { return d.id === id; });
+        if (!dish) return;
+        document.getElementById('dish-name').value = dish.name;
+        document.getElementById('dish-price').value = dish.price;
+        document.getElementById('dish-desc').value = dish.desc || '';
+        document.getElementById('dish-img').value = dish.img || '';
+        document.getElementById('dish-status').value = dish.status || 'active';
+        document.getElementById('dish-cat').value = dish.cat;
+        updateSubcatSelect();
+        document.getElementById('dish-subcat').value = dish.subcat;
+    } else {
+        ['dish-name','dish-price','dish-desc','dish-img'].forEach(function(f) { document.getElementById(f).value = ''; });
+        document.getElementById('dish-status').value = 'active';
+    }
+
+    openModal('dish-modal');
+}
+
+function saveDish() {
+    const name = document.getElementById('dish-name').value.trim();
+    const price = parseInt(document.getElementById('dish-price').value);
+    const cat = document.getElementById('dish-cat').value;
+    const subcat = document.getElementById('dish-subcat').value;
+
+    if (!name || !price || !cat || !subcat) { showToast('Заповніть всі обов\'язкові поля', 'error'); return; }
+
+    const dishes = ls('admin_dishes', []);
+    const editId = parseInt(document.getElementById('dish-edit-id').value);
+
+    if (editId) {
+        const idx = dishes.findIndex(function(d) { return d.id === editId; });
+        if (idx !== -1) {
+            dishes[idx] = Object.assign(dishes[idx], {
+                name, price, cat, subcat,
+                desc: document.getElementById('dish-desc').value.trim(),
+                img: document.getElementById('dish-img').value.trim(),
+                status: document.getElementById('dish-status').value
+            });
+            addActivity('Оновлено страву: ' + name, 'blue');
+        }
+    } else {
+        const newId = dishes.length ? Math.max.apply(null, dishes.map(function(d) { return d.id; })) + 1 : 1;
+        dishes.push({
+            id: newId, name, price, cat, subcat,
+            desc: document.getElementById('dish-desc').value.trim(),
+            img: document.getElementById('dish-img').value.trim(),
+            status: document.getElementById('dish-status').value
+        });
+        addActivity('Додано страву: ' + name, 'green');
+    }
+
+    lsSet('admin_dishes', dishes);
+    closeModal('dish-modal');
+    renderMenuTable();
+    renderDashboard();
+    showToast('Страву збережено');
+}
+
+function renderCatTable() {
+    const cats = ls('admin_categories', []);
+    const dishes = ls('admin_dishes', []);
+    document.getElementById('cat-tbody').innerHTML = cats.length ? cats.map(function(c, i) {
+        const dishCount = dishes.filter(function(d) { return d.cat === c.name; }).length;
+        return '<tr>' +
+            '<td class="td-muted">' + (i + 1) + '</td>' +
+            '<td><strong>' + c.name + '</strong></td>' +
+            '<td style="color:#999;font-size:12px">' + c.subs.join(', ') + '</td>' +
+            '<td class="td-muted">' + dishCount + '</td>' +
+            '<td style="display:flex;gap:6px">' +
+                '<button class="btn btn-ghost btn-sm" onclick="openCatModal(' + c.id + ')">Ред.</button>' +
+                '<button class="btn btn-danger btn-sm" onclick="confirmDelete(\'cat\',' + c.id + ',\'' + esc(c.name) + '\')">Видал.</button>' +
+            '</td>' +
+            '</tr>';
+    }).join('') : '<tr><td colspan="5" class="empty-table">Категорій немає</td></tr>';
+}
+
+function openCatModal(id) {
+    document.getElementById('cat-modal-title').textContent = id ? 'Редагувати категорію' : 'Нова категорія';
+    document.getElementById('cat-edit-id').value = id || '';
+    if (id) {
+        const cat = ls('admin_categories', []).find(function(c) { return c.id === id; });
+        if (!cat) return;
+        document.getElementById('cat-name').value = cat.name;
+        document.getElementById('cat-subs').value = cat.subs.join(', ');
+    } else {
+        document.getElementById('cat-name').value = '';
+        document.getElementById('cat-subs').value = '';
+    }
+    openModal('cat-modal');
+}
+
+function saveCat() {
+    const name = document.getElementById('cat-name').value.trim();
+    const subsRaw = document.getElementById('cat-subs').value.trim();
+    if (!name) { showToast('Введіть назву категорії', 'error'); return; }
+    const subs = subsRaw ? subsRaw.split(',').map(function(s) { return s.trim(); }).filter(Boolean) : [];
+
+    const cats = ls('admin_categories', []);
+    const editId = parseInt(document.getElementById('cat-edit-id').value);
+
+    if (editId) {
+        const idx = cats.findIndex(function(c) { return c.id === editId; });
+        if (idx !== -1) { cats[idx].name = name; cats[idx].subs = subs; }
+        addActivity('Оновлено категорію: ' + name, 'blue');
+    } else {
+        const newId = cats.length ? Math.max.apply(null, cats.map(function(c) { return c.id; })) + 1 : 1;
+        cats.push({ id: newId, name, subs });
+        addActivity('Додано категорію: ' + name, 'green');
+    }
+
+    lsSet('admin_categories', cats);
+    closeModal('cat-modal');
+    renderCatTable();
+    populateCatSelects();
+    showToast('Категорію збережено');
+}
+
+const ORDER_STATUSES = ['new', 'confirmed', 'cooking', 'delivered', 'cancelled'];
+function statusLabel(s) {
+    return { new: 'Нове', confirmed: 'Підтверджено', cooking: 'Готується', delivered: 'Доставлено', cancelled: 'Скасовано' }[s] || s;
+}
+function statusBadge(s) {
+    return { new: 'badge-orange', confirmed: 'badge-blue', cooking: 'badge-blue', delivered: 'badge-green', cancelled: 'badge-red' }[s] || 'badge-grey';
+}
+
+function renderOrdersTable() {
+    const orders = ls('admin_orders', []).slice().reverse();
+    document.getElementById('orders-tbody').innerHTML = orders.length ? orders.map(function(o) {
+        return '<tr>' +
+            '<td class="td-accent">№ ' + o.id + '</td>' +
+            '<td class="td-muted">' + fmtDate(o.date) + '</td>' +
+            '<td style="font-size:12px;color:#999">' + o.items.map(function(i) { return i.name + ' ×' + i.qty; }).join(', ') + '</td>' +
+            '<td class="td-accent">' + o.total + ' грн</td>' +
+            '<td><span class="badge ' + statusBadge(o.status) + '">' + statusLabel(o.status) + '</span></td>' +
+            '<td style="display:flex;gap:6px">' +
+                '<button class="btn btn-ghost btn-sm" onclick="openOrderModal(' + o.id + ')">Деталі</button>' +
+                '<button class="btn btn-danger btn-sm" onclick="confirmDelete(\'order\',' + o.id + ',\'№ ' + o.id + '\')">Видал.</button>' +
+            '</td>' +
+            '</tr>';
+    }).join('') : '<tr><td colspan="6" class="empty-table">Замовлень поки немає</td></tr>';
+}
+
+function openOrderModal(id) {
+    const order = ls('admin_orders', []).find(function(o) { return o.id === id; });
+    if (!order) return;
+    document.getElementById('order-modal-title').textContent = 'Замовлення № ' + order.id;
+    document.getElementById('order-modal-body').innerHTML =
+        '<table style="width:100%;margin-bottom:16px">' +
+        '<thead><tr><th>Страва</th><th>Кількість</th><th>Сума</th></tr></thead>' +
+        '<tbody>' + order.items.map(function(i) {
+            return '<tr><td>' + i.name + '</td><td class="td-muted">' + i.qty + '</td><td class="td-accent">' + (i.price * i.qty) + ' грн</td></tr>';
+        }).join('') + '</tbody>' +
+        '</table>' +
+        '<div style="display:flex;justify-content:space-between;padding:12px 0;border-top:0.5px solid rgba(255,255,255,0.08)">' +
+        '<span style="color:#999">Всього:</span><strong class="td-accent">' + order.total + ' грн</strong></div>' +
+        '<div style="margin-top:12px"><span style="font-size:11px;color:#555;text-transform:uppercase;letter-spacing:.5px">Поточний статус</span>' +
+        '<div style="margin-top:6px"><span class="badge ' + statusBadge(order.status) + '">' + statusLabel(order.status) + '</span></div></div>' +
+        '<div style="margin-top:14px"><span style="font-size:11px;color:#555;text-transform:uppercase;letter-spacing:.5px">Змінити статус</span>' +
+        '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">' +
+        ORDER_STATUSES.map(function(s) {
+            return '<button class="btn btn-ghost btn-sm' + (order.status === s ? '" style="border-color:rgb(206,116,51);color:rgb(206,116,51)' : '') + '" onclick="setOrderStatus(' + id + ',\'' + s + '\')">' + statusLabel(s) + '</button>';
+        }).join('') + '</div></div>';
+
+    document.getElementById('order-status-btn').style.display = 'none';
+    openModal('order-modal');
+}
+
+function setOrderStatus(id, status) {
+    const orders = ls('admin_orders', []);
+    const o = orders.find(function(o) { return o.id === id; });
+    if (!o) return;
+    o.status = status;
+    lsSet('admin_orders', orders);
+    addActivity('Статус замовлення №' + id + ' → ' + statusLabel(status), 'blue');
+    closeModal('order-modal');
+    renderOrdersTable();
+    renderDashboard();
+    showToast('Статус оновлено');
+}
+
+function clearOrders() {
+    openConfirm('Очистити весь архів замовлень?', '', function() {
+        lsSet('admin_orders', []);
+        renderOrdersTable();
+        renderDashboard();
+        showToast('Архів очищено');
+    });
+}
+
+function renderUsersTable() {
+    const users = ls('users', []);
+    const q = (document.getElementById('users-search') || {}).value || '';
+    const filtered = users.filter(function(u) {
+        return !q || u.name.toLowerCase().includes(q.toLowerCase()) || u.email.toLowerCase().includes(q.toLowerCase());
+    });
+
+    document.getElementById('users-tbody').innerHTML = filtered.length ? filtered.map(function(u, i) {
+        return '<tr>' +
+            '<td class="td-muted">' + (i + 1) + '</td>' +
+            '<td><strong>' + u.name + '</strong></td>' +
+            '<td class="td-muted">' + u.email + '</td>' +
+            '<td class="td-muted">' + (u.regDate || 'Невідомо') + '</td>' +
+            '<td><span class="badge badge-grey">Клієнт</span></td>' +
+            '<td><button class="btn btn-danger btn-sm" onclick="deleteUser(\'' + esc(u.email) + '\')">Видалити</button></td>' +
+            '</tr>';
+    }).join('') : '<tr><td colspan="6" class="empty-table">Користувачів не знайдено</td></tr>';
+}
+
+function deleteUser(email) {
+    openConfirm('Видалити користувача?', email, function() {
+        const users = ls('users', []).filter(function(u) { return u.email !== email; });
+        lsSet('users', users);
+        renderUsersTable();
+        renderDashboard();
+        addActivity('Видалено користувача: ' + email, 'red');
+        showToast('Користувача видалено');
+    });
+}
+
+function saveSettings() {
+    const settings = {
+        name: document.getElementById('set-name').value,
+        address: document.getElementById('set-address').value,
+        phone: document.getElementById('set-phone').value,
+        email: document.getElementById('set-email').value,
+        hours: document.getElementById('set-hours').value
+    };
+    lsSet('admin_settings', settings);
+    addActivity('Оновлено налаштування сайту', 'blue');
+    showToast('Налаштування збережено');
+}
+
+function changeAdminCreds() {
+    const email = document.getElementById('set-admin-email').value.trim();
+    const pass = document.getElementById('set-admin-pass').value;
+    const pass2 = document.getElementById('set-admin-pass2').value;
+
+    if (!email) { showToast('Введіть email', 'error'); return; }
+    if (pass && pass !== pass2) { showToast('Паролі не співпадають', 'error'); return; }
+    if (pass && pass.length < 8) { showToast('Пароль мінімум 8 символів', 'error'); return; }
+
+    const creds = ls('admin_creds', ADMIN_CREDENTIALS);
+    creds.email = email;
+    if (pass) creds.password = pass;
+    lsSet('admin_creds', creds);
+    addActivity('Оновлено дані адміністратора', 'blue');
+    showToast('Дані збережено. Використайте нові при наступному вході.');
+    ['set-admin-email','set-admin-pass','set-admin-pass2'].forEach(function(f) { document.getElementById(f).value = ''; });
+}
+
+function resetMenuToDefault() {
+    openConfirm('Скинути меню до початкового?', 'Всі зміни в стравах будуть втрачені', function() {
+        lsSet('admin_dishes', DEFAULT_DISHES);
+        lsSet('admin_categories', DEFAULT_CATEGORIES);
+        renderMenuTable();
+        renderCatTable();
+        renderDashboard();
+        populateCatSelects();
+        addActivity('Меню скинуто до початкового', 'red');
+        showToast('Меню відновлено');
+    });
+}
+
+function resetAllOrders() {
+    openConfirm('Видалити ВСІ замовлення?', 'Дію неможливо відмінити', function() {
+        lsSet('admin_orders', []);
+        renderOrdersTable();
+        renderDashboard();
+        addActivity('Скинуто всі замовлення', 'red');
+        showToast('Замовлення видалено');
+    });
+}
+
+function resetAllUsers() {
+    openConfirm('Видалити ВСІХ користувачів?', 'Дію неможливо відмінити', function() {
+        lsSet('users', []);
+        renderUsersTable();
+        renderDashboard();
+        addActivity('Видалено всіх користувачів', 'red');
+        showToast('Користувачів видалено');
+    });
+}
+
+function resetAllData() {
+    openConfirm('Повне скидання даних?', 'Видаляє страви, категорії, замовлення та користувачів', function() {
+        ['admin_dishes','admin_categories','admin_orders','users','admin_activity'].forEach(function(k) { localStorage.removeItem(k); });
+        initData();
+        renderAll();
+        showToast('Дані скинуто до початкових');
+    });
+}
+
+// ─── REVIEWS ─────────────────────────
+function getAllReviews() {
+    var dishes = ls('admin_dishes', []);
+    var all = [];
+    dishes.forEach(function(d) {
+        try {
+            var reviews = JSON.parse(localStorage.getItem('reviews_' + d.id) || '[]');
+            reviews.forEach(function(r) {
+                all.push(Object.assign({}, r, { dishId: d.id, dishName: d.name }));
+            });
+        } catch {}
+    });
+    return all;
+}
+
+function renderReviewsTable() {
+    var all = getAllReviews();
+    var tbody = document.getElementById('reviews-tbody');
+    if (!all.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-table">Відгуків поки немає</td></tr>';
+        return;
+    }
+    tbody.innerHTML = all.map(function(r) {
+        var stars = '';
+        for (var i = 1; i <= 5; i++) stars += i <= r.rating ? '★' : '☆';
+        var replyBadge = r.adminReply
+            ? '<span class="badge badge-green" style="margin-left:4px">Відповідь є</span>'
+            : '';
+        var safeEmail = r.email.replace(/\\/g, '').replace(/"/g, '');
+        return '<tr>' +
+            '<td><strong>' + r.dishName + '</strong></td>' +
+            '<td class="td-muted">' + r.name + '<br><span style="font-size:11px;color:#444">' + r.email + '</span></td>' +
+            '<td style="color:rgb(206,116,51)">' + stars + '</td>' +
+            '<td style="font-size:12px;color:#999;max-width:200px">' + (r.text || '<span style="color:#444">—</span>') + replyBadge + '</td>' +
+            '<td class="td-muted">' + (r.date || '—') + '</td>' +
+            '<td style="display:flex;gap:6px;flex-wrap:wrap">' +
+                '<button class="btn btn-ghost btn-sm" onclick="openReplyModal(' + r.dishId + ',&quot;' + safeEmail + '&quot;)">Відповісти</button>' +
+                '<button class="btn btn-danger btn-sm" onclick="deleteReview(' + r.dishId + ',&quot;' + safeEmail + '&quot;)">Видалити</button>' +
+            '</td>' +
+            '</tr>';
+    }).join('');
+}
+
+function openReplyModal(dishId, email) {
+    var reviews = [];
+    try { reviews = JSON.parse(localStorage.getItem('reviews_' + dishId) || '[]'); } catch {}
+    email = String(email);
+    var r = reviews.find(function(x) { return x.email === email; });
+    if (!r) return;
+    document.getElementById('reply-dish-id').value = dishId;
+    document.getElementById('reply-review-email').value = email;
+    document.getElementById('reply-original').textContent = (r.name + ': ') + (r.text || '(без тексту, оцінка ' + r.rating + '★)');
+    document.getElementById('reply-text').value = r.adminReply || '';
+    openModal('reply-modal');
+}
+
+function saveReply() {
+    var dishId = parseInt(document.getElementById('reply-dish-id').value);
+    var email  = document.getElementById('reply-review-email').value;
+    var text   = document.getElementById('reply-text').value.trim();
+    if (!text) { showToast('Введіть текст відповіді', 'error'); return; }
+    var reviews = [];
+    try { reviews = JSON.parse(localStorage.getItem('reviews_' + dishId) || '[]'); } catch {}
+    var r = reviews.find(function(x) { return x.email === email; });
+    if (r) r.adminReply = text;
+    localStorage.setItem('reviews_' + dishId, JSON.stringify(reviews));
+    closeModal('reply-modal');
+    renderReviewsTable();
+    addActivity('Відповідь на відгук від ' + email, 'blue');
+    showToast('Відповідь збережено');
+}
+
+function deleteReview(dishId, email) {
+    email = String(email);
+    openConfirm('Видалити відгук?', email, function() {
+        var reviews = [];
+        try { reviews = JSON.parse(localStorage.getItem('reviews_' + dishId) || '[]'); } catch {}
+        reviews = reviews.filter(function(r) { return r.email !== email; });
+        localStorage.setItem('reviews_' + dishId, JSON.stringify(reviews));
+        renderReviewsTable();
+        renderDashboard();
+        addActivity('Видалено відгук від ' + email, 'red');
+        showToast('Відгук видалено');
+    });
+}
+
+initData();
+
+function confirmDelete(type, id, label) {
+    const msgs = { dish: 'Видалити страву?', cat: 'Видалити категорію?', order: 'Видалити замовлення?' };
+    openConfirm(msgs[type] || 'Видалити?', label, function() {
+        if (type === 'dish') {
+            lsSet('admin_dishes', ls('admin_dishes', []).filter(function(d) { return d.id !== id; }));
+            addActivity('Видалено страву: ' + label, 'red');
+            renderMenuTable();
+            renderDashboard();
+        } else if (type === 'cat') {
+            lsSet('admin_categories', ls('admin_categories', []).filter(function(c) { return c.id !== id; }));
+            addActivity('Видалено категорію: ' + label, 'red');
+            renderCatTable();
+        } else if (type === 'order') {
+            lsSet('admin_orders', ls('admin_orders', []).filter(function(o) { return o.id !== id; }));
+            addActivity('Видалено замовлення ' + label, 'red');
+            renderOrdersTable();
+            renderDashboard();
+        }
+        showToast('Видалено');
+    });
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+document.querySelectorAll('.modal-overlay').forEach(function(overlay) {
+    overlay.addEventListener('click', function(e) {
+        if (e.target === overlay) overlay.classList.remove('open');
+    });
+});
+
+let confirmCallback = null;
+function openConfirm(text, name, cb) {
+    document.getElementById('confirm-text').textContent = text;
+    document.getElementById('confirm-name').textContent = name || '';
+    confirmCallback = cb;
+    openModal('confirm-modal');
+}
+
+document.getElementById('confirm-ok-btn').addEventListener('click', function() {
+    closeModal('confirm-modal');
+    if (confirmCallback) { confirmCallback(); confirmCallback = null; }
+});
+
+let toastTimer = null;
+function showToast(msg, type) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast' + (type ? ' ' + type : ' success');
+    t.classList.add('show');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function() { t.classList.remove('show'); }, 2800);
+}
+
+function statusDishLabel(s) { return { active: 'Активна', hidden: 'Прихована', out: 'Немає' }[s] || s; }
+function statusDishBadge(s) { return { active: 'badge-green', hidden: 'badge-grey', out: 'badge-red' }[s] || 'badge-grey'; }
+
+function fmtDate(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    return d.toLocaleDateString('uk-UA') + ' ' + d.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
+}
+
+function esc(s) { return String(s).replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
+
+initData();
+
+(function() {
+    const session = ls('admin_session', null);
+    if (session && Date.now() - session.ts < 3600000 * 8) {
+        document.getElementById('access-gate').style.display = 'none';
+        document.getElementById('admin-app').style.display = 'block';
+        document.getElementById('topnav-user').textContent = session.email;
+        renderAll();
+        renderActivityList();
+    }
+})();
+</script>
+
+</body>
+</html>

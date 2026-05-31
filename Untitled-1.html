@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Головна сторінка</title>
+    <link rel="stylesheet" href="Untitled-1.css">
+</head>
+
+<body>
+
+    <nav>
+        <h2><span class="Big-logo">Big</span> <span class="Dream-logo">Dream</span></h2>
+        <div>
+            <a href="Untitled-1.html" class="active">Головна</a>
+            <a href="Untitled-2.html">Меню</a>
+            <a href="Untitled-3.html">Кошик</a>
+            <a href="Untitled-4.html">Вхід</a>
+        </div>
+    </nav>
+
+    <img class="hero-img" src="hoban-brasserie-01.jpg" alt="Restaurant Big Dream">
+
+    <div id="toast" class="toast">Ласкаво просимо до ресторану Big Dream!</div>
+
+    <div class="content">
+        <hr>
+        <h3>Про нас</h3>
+        <p>Ласкаво просимо до ресторану "Big Dream" - місце, де смачна їжа поєднується з атмосферою затишку та натхнення. Ми створили простір, у якому кожен гість може відчути себе особливим та насолодитися найкращими стравами з усього світу. У нашому меню ви знайдете різноманітні страви: від класичних європейських до популярних азійських позицій. Ми використовуємо лише свіжі та якісні інгредієнти, щоб кожна страва дарувала справжнє задоволення.</p>
+        <p>— Замовляйте улюблені страви онлайн<br>
+        — Насолоджуйтесь швидкою доставкою<br>
+        — Відкривайте для себе нові смаки разом з нами</p>
+        <p>Ресторан "Big Dream" - це сучасний заклад, який поєднує стильний інтер'єр, привітний сервіс та різноманітну кухню. Наша мета - створити комфортну атмосферу для кожного гостя.</p>
+        <hr>
+
+        <div class="contacts">
+            <div class="contact-item">
+                <span class="contact-label">Адреса</span>
+                <span class="contact-value" id="info-address">м. Південне, вул. Приморська, 15</span>
+            </div>
+            <div class="contact-item">
+                <span class="contact-label">Телефон</span>
+                <span class="contact-value" id="info-phone">+380 63 223 75 60</span>
+            </div>
+            <div class="contact-item">
+                <span class="contact-label">Email</span>
+                <span class="contact-value" id="info-email">bigdream.restaurant@gmail.com</span>
+            </div>
+            <div class="contact-item">
+                <span class="contact-label">Години роботи</span>
+                <span class="contact-value" id="info-hours">Пн–Нд: 10:00–22:00</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener('load', function() {
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(function() { toast.classList.remove('show'); }, 3000);
+
+            try {
+                var s = JSON.parse(localStorage.getItem('admin_settings'));
+                if (s) {
+                    if (s.address) document.getElementById('info-address').textContent = s.address;
+                    if (s.phone)   document.getElementById('info-phone').textContent   = s.phone;
+                    if (s.email)   document.getElementById('info-email').textContent   = s.email;
+                    if (s.hours)   document.getElementById('info-hours').textContent   = s.hours;
+                }
+            } catch(e) {}
+        });
+    </script>
+
+</body>
+</html>

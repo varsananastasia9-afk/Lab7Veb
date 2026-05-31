@@ -1,0 +1,139 @@
+body {
+    background-color: #111;
+    color: white;
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+}
+
+nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    background: #2e2e2e;
+    border-bottom: 0.5px solid rgba(255,255,255,0.1);
+}
+
+nav h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.Big-logo { color: white; }
+.Dream-logo { color: rgb(206, 116, 51); }
+
+nav a {
+    font-size: 13px;
+    color: #999;
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 8px;
+}
+
+nav a:hover { background: #2a2a2a; color: white; }
+nav a.active { background: #2a2a2a; color: white; font-weight: 500; }
+
+.content {
+    padding: 48px 24px;
+    display: flex;
+    justify-content: center;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 380px;
+}
+
+.tab-switcher {
+    display: flex;
+    background: #1a1a1a;
+    border-radius: 10px;
+    padding: 4px;
+    margin-bottom: 28px;
+    border: 0.5px solid rgba(255,255,255,0.1);
+}
+
+.tab {
+    flex: 1;
+    padding: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 8px;
+    color: #999;
+    border: none;
+    background: none;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.15s;
+}
+
+.tab.active {
+    background: #2e2e2e;
+    color: white;
+    font-weight: 500;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: #666;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 14px;
+    border: 0.5px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
+    background: #1a1a1a;
+    color: white;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.form-group input:focus {
+    border-color: rgba(255,255,255,0.35);
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 11px;
+    font-size: 14px;
+    font-weight: 500;
+    border: none;
+    border-radius: 8px;
+    background: white;
+    color: #111;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    margin-top: 8px;
+    transition: background 0.15s;
+}
+
+.submit-btn:hover {
+    background: #ddd;
+}
+
+.field-hint {
+    display: block;
+    font-size: 12px;
+    color: rgb(206, 116, 51);
+    margin-top: 4px;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.field-hint.show {
+    opacity: 1;
+    transform: translateY(0);
+}

@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Меню</title>
+    <link rel="stylesheet" href="Untitled-2.css">
+    <style>
+        .dish-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(6px);
+            z-index: 300;
+            display: none;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 24px 16px;
+            overflow-y: auto;
+        }
+        .dish-modal-overlay.open { display: flex; }
+
+        .dish-modal {
+            background: #161616;
+            border: 0.5px solid rgba(255,255,255,0.12);
+            border-radius: 18px;
+            width: 100%;
+            max-width: 520px;
+            overflow: hidden;
+            animation: dmSlide 0.28s ease;
+            margin: auto;
+        }
+        @keyframes dmSlide {
+            from { opacity:0; transform: translateY(28px); }
+            to   { opacity:1; transform: translateY(0); }
+        }
+
+        .dm-img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            display: block;
+            background: #1a1a1a;
+        }
+        .dm-img-placeholder {
+            width: 100%;
+            height: 240px;
+            background: #1a1a1a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: #2a2a2a;
+        }
+
+        .dm-body { padding: 22px 24px 28px; }
+
+        .dm-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 6px;
+        }
+        .dm-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+        }
+        .dm-price {
+            font-size: 18px;
+            font-weight: 600;
+            color: rgb(206,116,51);
+            white-space: nowrap;
+        }
+        .dm-meta {
+            font-size: 12px;
+            color: #555;
+            margin-bottom: 10px;
+        }
+        .dm-desc {
+            font-size: 13px;
+            color: #aaa;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .dm-rating-block {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .dm-rating-big {
+            font-size: 32px;
+            font-weight: 700;
+            color: white;
+            line-height: 1;
+        }
+        .dm-rating-right { flex: 1; }
+        .dm-stars-display { color: rgb(206,116,51); font-size: 18px; letter-spacing: 2px; }
+        .dm-rating-count { font-size: 11px; color: #555; margin-top: 2px; }
+
+        .dm-review-section { margin-bottom: 20px; }
+        .dm-section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 0.5px solid rgba(255,255,255,0.08);
+        }
+
+        .dm-star-picker {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+        .dm-star {
+            font-size: 26px;
+            color: #333;
+            cursor: pointer;
+            transition: color 0.1s, transform 0.1s;
+            line-height: 1;
+        }
+        .dm-star:hover, .dm-star.active { color: rgb(206,116,51); transform: scale(1.15); }
+
+        .dm-review-input {
+            width: 100%;
+            background: #1e1e1e;
+            border: 0.5px solid rgba(255,255,255,0.12);
+            border-radius: 8px;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            padding: 10px 12px;
+            resize: none;
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.15s;
+        }
+        .dm-review-input:focus { border-color: rgba(255,255,255,0.3); }
+        .dm-review-input::placeholder { color: #444; }
+
+        .dm-submit-btn {
+            margin-top: 10px;
+            padding: 9px 20px;
+            font-size: 13px;
+            font-weight: 500;
+            background: white;
+            color: #111;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: background 0.15s;
+        }
+        .dm-submit-btn:hover { background: #ddd; }
+
+        .dm-login-hint {
+            background: #1a1a1a;
+            border: 0.5px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            padding: 14px 16px;
+            font-size: 13px;
+            color: #666;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .dm-login-hint a {
+            color: rgb(206,116,51);
+            text-decoration: none;
+        }
+        .dm-login-hint a:hover { text-decoration: underline; }
+
+        .dm-reviews-list { display: flex; flex-direction: column; gap: 10px; }
+
+        .dm-review-item {
+            background: #1a1a1a;
+            border-radius: 10px;
+            padding: 12px 14px;
+        }
+        .dm-review-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+        .dm-review-author {
+            font-size: 13px;
+            font-weight: 500;
+            color: white;
+        }
+        .dm-review-stars { color: rgb(206,116,51); font-size: 13px; }
+        .dm-review-date { font-size: 11px; color: #444; margin-top: 2px; margin-bottom: 6px; }
+        .dm-review-text { font-size: 13px; color: #999; line-height: 1.5; }
+
+        .dm-no-reviews {
+            font-size: 13px;
+            color: #444;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .dm-close-btn {
+            display: block;
+            width: 100%;
+            margin-top: 20px;
+            padding: 10px;
+            font-size: 13px;
+            background: transparent;
+            color: #666;
+            border: 0.5px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: color 0.15s;
+        }
+        .dm-close-btn:hover { color: white; }
+
+        .dish-row { cursor: pointer; }
+        .dish-row:hover { background: rgba(255,255,255,0.03); border-radius: 8px; }
+
+        .dish-mini-rating {
+            font-size: 11px;
+            color: #666;
+            margin-top: 3px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .dish-mini-rating .star { color: rgb(206,116,51); }
+
+        .dm-admin-reply {
+            margin-top: 8px;
+            background: rgba(206,116,51,0.08);
+            border-left: 2px solid rgb(206,116,51);
+            border-radius: 0 8px 8px 0;
+            padding: 8px 12px;
+            font-size: 12px;
+            color: #bbb;
+        }
+        .dm-admin-reply-label {
+            font-size: 11px;
+            color: rgb(206,116,51);
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+        .dm-edit-btn {
+            font-size: 11px;
+            color: #555;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: Inter,sans-serif;
+            transition: color 0.15s;
+        }
+        .dm-edit-btn:hover { color: rgb(206,116,51); }
+    </style>
+</head>
+
+<body>
+
+    <nav>
+        <h2><span class="logo-big">Big</span> <span class="logo-dream">Dream</span></h2>
+        <div id="nav-links">
+            <a href="Untitled-1.html">Головна</a>
+            <a href="Untitled-2.html" class="active">Меню</a>
+            <a href="Untitled-3.html">Кошик</a>
+            <a href="Untitled-4.html" id="nav-auth-link">Вхід</a>
+        </div>
+    </nav>
+
+    <div id="toast" class="toast">Страву додано до кошика!</div>
+
+    <div class="content" id="menu-content">
+        <div style="padding:60px 0;text-align:center;color:#555;font-size:13px">Завантаження меню...</div>
+    </div>
+
+    <div class="dish-modal-overlay" id="dish-modal-overlay">
+        <div class="dish-modal" id="dish-modal">
+            <div id="dm-img-wrap"></div>
+            <div class="dm-body">
+                <div class="dm-header">
+                    <div class="dm-name" id="dm-name"></div>
+                    <div class="dm-price" id="dm-price"></div>
+                </div>
+                <div class="dm-meta" id="dm-meta"></div>
+                <div class="dm-desc" id="dm-desc"></div>
+
+                <div class="dm-rating-block">
+                    <div class="dm-rating-big" id="dm-avg">—</div>
+                    <div class="dm-rating-right">
+                        <div class="dm-stars-display" id="dm-stars-display">☆☆☆☆☆</div>
+                        <div class="dm-rating-count" id="dm-rating-count">Оцінок поки немає</div>
+                    </div>
+                </div>
+
+                <div class="dm-review-section">
+                    <div class="dm-section-title">Відгуки</div>
+                    <div id="dm-form-area"></div>
+                </div>
+
+                <div class="dm-reviews-list" id="dm-reviews-list"></div>
+
+                <button class="dm-close-btn" onclick="closeDishModal()">Закрити</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var DEFAULT_DISHES = [
+            { id:1,  name:'Карбонара',               desc:'Паста, яйце, бекон, сир, вершки',             price:189, cat:'Європейська кухня',   subcat:'Паста',     img:'pasta-karbonara.jpg',     status:'active' },
+            { id:2,  name:'Болоньєзе',               desc:'Паста, фарш, томатний соус, овочі',           price:175, cat:'Європейська кухня',   subcat:'Паста',     img:'balioneze.jpg',           status:'active' },
+            { id:3,  name:'Феттучіні Альфредо',      desc:'Паста, вершки, масло, сир',                   price:195, cat:'Європейська кухня',   subcat:'Паста',     img:'Fettuchinne.jpeg',        status:'active' },
+            { id:4,  name:'Біфштекс класичний',      desc:'Яловичина, картопляне пюре',                  price:320, cat:'Європейська кухня',   subcat:'Біфштекси', img:'steak obichniy.png',      status:'active' },
+            { id:5,  name:'Біфштекс грибний',        desc:'Яловичина, гриби, вершки',                    price:345, cat:'Європейська кухня',   subcat:'Біфштекси', img:'gribu_Steak.jpg',         status:'active' },
+            { id:6,  name:'Біфштекс по-бургундськи', desc:'Яловичина, вино, овочі',                      price:365, cat:'Європейська кухня',   subcat:'Біфштекси', img:'steak_Burgudski.jpg',     status:'active' },
+            { id:7,  name:'Шніцель з яловичини',     desc:'Яловичий фарш, цибуля, яйце, хліб, спеції',  price:280, cat:'Європейська кухня',   subcat:'Шніцель',   img:'snicel_yalovuchuna.jpg',  status:'active' },
+            { id:8,  name:'Шніцель зі свинини',      desc:'Свинина, сухарі, спеції',                     price:255, cat:'Європейська кухня',   subcat:'Шніцель',   img:'snicel_pig.jpg',          status:'active' },
+            { id:9,  name:'Шніцель курячий',         desc:'Курка, панірування, яйце',                    price:235, cat:'Європейська кухня',   subcat:'Шніцель',   img:'shnitsel_kyrica.jpg',     status:'active' },
+            { id:10, name:'Каліфорнія з креветкою',  desc:'Рис, краб, авокадо, огірок, креветка',        price:210, cat:'Азійська кухня',      subcat:'Суші',      img:'kalif_krevetka.jpeg',     status:'active' },
+            { id:11, name:'Філадельфія',              desc:'Рис, лосось, сир, огірок',                    price:225, cat:'Азійська кухня',      subcat:'Суші',      img:'philadelphia.jpg',        status:'active' },
+            { id:12, name:'Нігірі з тунцем',         desc:'Рис, тунець',                                 price:195, cat:'Азійська кухня',      subcat:'Суші',      img:'nuguru_tunec.jpeg',       status:'active' },
+            { id:13, name:'Зелений тайський',         desc:'Курка, кокосове молоко, спеції',              price:245, cat:'Азійська кухня',      subcat:'Каррі',     img:'зелений каррі.jpg',      status:'active' },
+            { id:14, name:'Червоний тайський',        desc:"М'ясо, паста каррі, овочі",                  price:255, cat:'Азійська кухня',      subcat:'Каррі',     img:'karri_red.jpg',           status:'active' },
+            { id:15, name:'Індійський курячий',       desc:'Курка, спеції, томати',                       price:240, cat:'Азійська кухня',      subcat:'Каррі',     img:'каррі з індійський.jpg', status:'active' },
+            { id:16, name:'Червоне Каберне',          desc:'',                                            price:185, cat:'Алкогольні напої',    subcat:'Вино',      img:'Cabernet_vine.jpg',       status:'active' },
+            { id:17, name:'Біле Шардоне',             desc:'',                                            price:175, cat:'Алкогольні напої',    subcat:'Вино',      img:'shardone.jpg',            status:'active' },
+            { id:18, name:'Ігристе Просекко',         desc:'',                                            price:195, cat:'Алкогольні напої',    subcat:'Вино',      img:'ігристе.png',            status:'active' },
+            { id:19, name:'Лагер',                    desc:'',                                            price:75,  cat:'Алкогольні напої',    subcat:'Пиво',      img:'lager.jpg',               status:'active' },
+            { id:20, name:'Ель',                      desc:'',                                            price:85,  cat:'Алкогольні напої',    subcat:'Пиво',      img:'el.jpg',                  status:'active' },
+            { id:21, name:'Скотч',                    desc:'',                                            price:145, cat:'Алкогольні напої',    subcat:'Віскі',     img:'scotch.jpg',              status:'active' },
+            { id:22, name:'Бурбон',                   desc:'',                                            price:155, cat:'Алкогольні напої',    subcat:'Віскі',     img:'бурбон.jpg',             status:'active' },
+            { id:23, name:'Зелений чай',              desc:'',                                            price:55,  cat:'Безалкогольні напої', subcat:'Чай',       img:'чай зелений.jpg',        status:'active' },
+            { id:24, name:'Чорний чай',               desc:'',                                            price:50,  cat:'Безалкогольні напої', subcat:'Чай',       img:'чорний чай.jpg',         status:'active' },
+            { id:25, name:'Еспресо',                  desc:'',                                            price:65,  cat:'Безалкогольні напої', subcat:'Кава',      img:'еспресо.jpg',            status:'active' },
+            { id:26, name:'Латте',                    desc:'',                                            price:85,  cat:'Безалкогольні напої', subcat:'Кава',      img:'латте.jpg',              status:'active' },
+            { id:27, name:'Капучино',                 desc:'',                                            price:80,  cat:'Безалкогольні напої', subcat:'Кава',      img:'капучино.jpg',           status:'active' },
+            { id:28, name:'Класичний лимонад',        desc:'Вода, лимон, цукор',                          price:70,  cat:'Безалкогольні напої', subcat:'Лимонад',   img:'звичайний лимонад.jpg',  status:'active' },
+            { id:29, name:'Полуничний лимонад',       desc:'Полуниця, вода, цукор',                       price:75,  cat:'Безалкогольні напої', subcat:'Лимонад',   img:'лимонад полуниця.jpg',   status:'active' }
+        ];
+        var DEFAULT_CATEGORIES = [
+            { id:1, name:'Європейська кухня',   subs:['Паста','Біфштекси','Шніцель'] },
+            { id:2, name:'Азійська кухня',      subs:['Суші','Каррі'] },
+            { id:3, name:'Алкогольні напої',    subs:['Вино','Пиво','Віскі'] },
+            { id:4, name:'Безалкогольні напої', subs:['Чай','Кава','Лимонад'] }
+        ];
+
+        function getCurrentUser() {
+            try {
+                var s = JSON.parse(localStorage.getItem('user_session'));
+                if (s && s.name) return s;
+            } catch {}
+            return null;
+        }
+
+        function updateNav() {
+            var user = getCurrentUser();
+            var link = document.getElementById('nav-auth-link');
+            if (!link) return;
+            if (user) {
+                link.textContent = user.name;
+                link.href = 'Untitled-4.html';
+            } else {
+                link.textContent = 'Вхід';
+                link.href = 'Untitled-4.html';
+            }
+        }
+
+        function getReviews(dishId) {
+            try { return JSON.parse(localStorage.getItem('reviews_' + dishId)) || []; }
+            catch { return []; }
+        }
+        function saveReviews(dishId, reviews) {
+            localStorage.setItem('reviews_' + dishId, JSON.stringify(reviews));
+        }
+        function getAvgRating(dishId) {
+            var reviews = getReviews(dishId);
+            if (!reviews.length) return null;
+            var sum = reviews.reduce(function(s, r) { return s + r.rating; }, 0);
+            return Math.round((sum / reviews.length) * 10) / 10;
+        }
+        function starsHtml(rating, size) {
+            var full = Math.round(rating);
+            var html = '';
+            for (var i = 1; i <= 5; i++) {
+                html += i <= full ? '★' : '☆';
+            }
+            return html;
+        }
+
+        function getDishes() {
+            try { var v = localStorage.getItem('admin_dishes'); if (v) return JSON.parse(v); } catch {}
+            localStorage.setItem('admin_dishes', JSON.stringify(DEFAULT_DISHES));
+            return DEFAULT_DISHES;
+        }
+        function getCategories() {
+            try { var v = localStorage.getItem('admin_categories'); if (v) return JSON.parse(v); } catch {}
+            localStorage.setItem('admin_categories', JSON.stringify(DEFAULT_CATEGORIES));
+            return DEFAULT_CATEGORIES;
+        }
+
+        var dishIndex = {};
+
+        function renderMenu() {
+            var dishes = getDishes();
+            var categories = getCategories();
+            var content = document.getElementById('menu-content');
+            var activeDishes = dishes.filter(function(d) { return d.status === 'active'; });
+
+            if (!activeDishes.length) {
+                content.innerHTML = '<div style="padding:80px 0;text-align:center;color:#555"><div style="font-size:32px;margin-bottom:12px">○</div><div style="font-size:15px;color:#666">Меню тимчасово недоступне</div></div>';
+                return;
+            }
+
+            var html = '';
+            categories.forEach(function(cat) {
+                var subsWithDishes = cat.subs.filter(function(sub) {
+                    return activeDishes.some(function(d) { return d.cat === cat.name && d.subcat === sub; });
+                });
+                var uncategorized = activeDishes.filter(function(d) {
+                    return d.cat === cat.name && !cat.subs.includes(d.subcat);
+                });
+                if (!subsWithDishes.length && !uncategorized.length) return;
+                html += '<div class="section-label"><h2>' + escHtml(cat.name) + '</h2></div>';
+                subsWithDishes.forEach(function(sub) {
+                    var subDishes = activeDishes.filter(function(d) { return d.cat === cat.name && d.subcat === sub; });
+                    html += '<div class="subsection"><div class="subsection-title">' + escHtml(sub) + '</div>';
+                    subDishes.forEach(function(d) { html += renderDishRow(d); });
+                    html += '</div>';
+                });
+                if (uncategorized.length) {
+                    html += '<div class="subsection">';
+                    uncategorized.forEach(function(d) { html += renderDishRow(d); });
+                    html += '</div>';
+                }
+            });
+
+            content.innerHTML = html;
+            var rows = content.querySelectorAll('.dish-row');
+            rows.forEach(function(row, i) {
+                row.style.opacity = '0';
+                row.style.transform = 'translateX(-16px)';
+                row.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+                setTimeout(function() { row.style.opacity = '1'; row.style.transform = 'translateX(0)'; }, i * 50);
+            });
+        }
+
+        function renderDishRow(d) {
+            dishIndex[d.id] = d;
+            var avg = getAvgRating(d.id);
+            var reviews = getReviews(d.id);
+
+            var imgHtml = d.img
+                ? '<img class="dish-img" src="' + escAttr(d.img) + '" alt="' + escAttr(d.name) + '" onerror="this.style.display=\'none\'">'
+                : '<div class="dish-img" style="background:#1a1a1a;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#333;font-size:22px">○</div>';
+
+            var miniRating = avg
+                ? '<div class="dish-mini-rating"><span class="star">★</span>' + avg + ' (' + reviews.length + ')</div>'
+                : '<div class="dish-mini-rating">Без оцінок</div>';
+
+            var outBadge = d.status === 'out' ? '<span style="font-size:11px;color:#e05555;margin-left:6px">Немає</span>' : '';
+
+            var btnHtml = d.status === 'out'
+                ? '<button class="cart-btn" disabled style="opacity:0.3;cursor:not-allowed" onclick="event.stopPropagation()">+</button>'
+                : '<button class="cart-btn" onclick="event.stopPropagation();addToCart(' + d.id + ')">+</button>';
+
+            return '<div class="dish-row" onclick="openDishModal(' + d.id + ')">' +
+                imgHtml +
+                '<div class="dish-info">' +
+                    '<div class="dish-name">' + escHtml(d.name) + outBadge + '</div>' +
+                    (d.desc ? '<div class="dish-desc">' + escHtml(d.desc) + '</div>' : '') +
+                    miniRating +
+                '</div>' +
+                '<div class="dish-right">' +
+                    '<div class="dish-price">' + d.price + ' грн</div>' +
+                    btnHtml +
+                '</div>' +
+                '</div>';
+        }
+
+        var currentDishId = null;
+        var selectedRating = 0;
+
+        function openDishModal(id) {
+            var d = dishIndex[id];
+            if (!d) return;
+            currentDishId = id;
+            selectedRating = 0;
+
+            var imgWrap = document.getElementById('dm-img-wrap');
+            if (d.img) {
+                imgWrap.innerHTML = '<img class="dm-img" src="' + escAttr(d.img) + '" alt="' + escAttr(d.name) + '" onerror="this.parentNode.innerHTML=\'<div class=dm-img-placeholder>○</div>\'">';
+            } else {
+                imgWrap.innerHTML = '<div class="dm-img-placeholder">○</div>';
+            }
+
+            document.getElementById('dm-name').textContent = d.name;
+            document.getElementById('dm-price').textContent = d.price + ' грн';
+            document.getElementById('dm-meta').textContent = d.cat + (d.subcat ? ' · ' + d.subcat : '');
+            document.getElementById('dm-desc').textContent = d.desc || '';
+            document.getElementById('dm-desc').style.display = d.desc ? 'block' : 'none';
+
+            renderModalRating(id);
+            renderFormArea(id);
+            renderReviews(id);
+
+            document.getElementById('dish-modal-overlay').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDishModal() {
+            document.getElementById('dish-modal-overlay').classList.remove('open');
+            document.body.style.overflow = '';
+            currentDishId = null;
+        }
+
+        document.getElementById('dish-modal-overlay').addEventListener('click', function(e) {
+            if (e.target === this) closeDishModal();
+        });
+
+        function renderModalRating(id) {
+            var reviews = getReviews(id);
+            var avg = getAvgRating(id);
+            document.getElementById('dm-avg').textContent = avg ? avg.toFixed(1) : '—';
+            document.getElementById('dm-stars-display').textContent = avg ? starsHtml(avg) : '☆☆☆☆☆';
+            document.getElementById('dm-rating-count').textContent = reviews.length
+                ? reviews.length + ' ' + reviewWord(reviews.length)
+                : 'Оцінок поки немає';
+        }
+
+        function reviewWord(n) {
+            if (n % 10 === 1 && n % 100 !== 11) return 'відгук';
+            if ([2,3,4].includes(n % 10) && ![12,13,14].includes(n % 100)) return 'відгуки';
+            return 'відгуків';
+        }
+
+   function renderFormArea(id) {
+    var user = getCurrentUser();
+    var area = document.getElementById('dm-form-area');
+    if (!user) {
+        area.innerHTML = '<div class="dm-login-hint">Щоб залишити відгук, <a href="Untitled-4.html">увійдіть в акаунт</a></div>';
+        return;
+    }
+    var reviews = getReviews(id);
+    var already = reviews.find(function(r) { return r.email === user.email; });
+    if (already) {
+        selectedRating = already.rating;
+        area.innerHTML =
+            '<div style="font-size:12px;color:#555;margin-bottom:8px">Ваш відгук — ви можете його відредагувати:</div>' +
+            '<div class="dm-star-picker" id="dm-star-picker">' +
+                '<span class="dm-star" onclick="selectStar(1)">★</span>' +
+                '<span class="dm-star" onclick="selectStar(2)">★</span>' +
+                '<span class="dm-star" onclick="selectStar(3)">★</span>' +
+                '<span class="dm-star" onclick="selectStar(4)">★</span>' +
+                '<span class="dm-star" onclick="selectStar(5)">★</span>' +
+            '</div>' +
+            '<textarea class="dm-review-input" id="dm-review-text" rows="3">' + escHtml(already.text || '') + '</textarea>' +
+            '<button class="dm-submit-btn" onclick="submitReview(true)">Зберегти зміни</button>';
+        setTimeout(function() {
+            var stars = document.querySelectorAll('#dm-star-picker .dm-star');
+            stars.forEach(function(s, i) {
+                s.classList.toggle('active', i < already.rating);
+            });
+        }, 0);
+        return;
+    }
+    area.innerHTML =
+        '<div class="dm-star-picker" id="dm-star-picker">' +
+            '<span class="dm-star" onclick="selectStar(1)">★</span>' +
+            '<span class="dm-star" onclick="selectStar(2)">★</span>' +
+            '<span class="dm-star" onclick="selectStar(3)">★</span>' +
+            '<span class="dm-star" onclick="selectStar(4)">★</span>' +
+            '<span class="dm-star" onclick="selectStar(5)">★</span>' +
+        '</div>' +
+        '<textarea class="dm-review-input" id="dm-review-text" rows="3" placeholder="Ваш відгук (необов\'язково)..."></textarea>' +
+        '<button class="dm-submit-btn" onclick="submitReview()">Надіслати відгук</button>';
+}
+
+        function selectStar(n) {
+            selectedRating = n;
+            var stars = document.querySelectorAll('#dm-star-picker .dm-star');
+            stars.forEach(function(s, i) {
+                s.classList.toggle('active', i < n);
+            });
+        }
+
+        function submitReview(isEdit) {
+            var user = getCurrentUser();
+            if (!user || !currentDishId) return;
+            if (!selectedRating) { alert('Будь ласка, оберіть оцінку від 1 до 5 зірок'); return; }
+            var text = (document.getElementById('dm-review-text').value || '').trim();
+            var reviews = getReviews(currentDishId);
+            if (isEdit) {
+                var idx = reviews.findIndex(function(r) { return r.email === user.email; });
+                if (idx !== -1) {
+                    reviews[idx].rating = selectedRating;
+                    reviews[idx].text   = text;
+                    reviews[idx].edited = true;
+                }
+            } else {
+                reviews.unshift({ name: user.name, email: user.email, rating: selectedRating, text: text, date: new Date().toLocaleDateString('uk-UA') });
+            }
+            saveReviews(currentDishId, reviews);
+            selectedRating = 0;
+            renderModalRating(currentDishId);
+            renderFormArea(currentDishId);
+            renderReviews(currentDishId);
+            renderMenu();
+            document.getElementById('dm-reviews-list').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function renderReviews(id) {
+            var reviews = getReviews(id);
+            var list = document.getElementById('dm-reviews-list');
+            if (!reviews.length) {
+                list.innerHTML = '<div class="dm-no-reviews">Відгуків ще немає. Будьте першим!</div>';
+                return;
+            }
+            list.innerHTML = reviews.map(function(r) {
+                var replyHtml = r.adminReply
+                    ? '<div class="dm-admin-reply"><div class="dm-admin-reply-label">Відповідь адміністратора</div>' + escHtml(r.adminReply) + '</div>'
+                    : '';
+                var editedLabel = r.edited ? '<span style="font-size:10px;color:#444;margin-left:6px">(редаговано)</span>' : '';
+                return '<div class="dm-review-item">' +
+                    '<div class="dm-review-top">' +
+                        '<span class="dm-review-author">' + escHtml(r.name) + '</span>' +
+                        '<span class="dm-review-stars">' + starsHtml(r.rating) + '</span>' +
+                    '</div>' +
+                    '<div class="dm-review-date">' + escHtml(r.date) + editedLabel + '</div>' +
+                    (r.text ? '<div class="dm-review-text">' + escHtml(r.text) + '</div>' : '') +
+                    replyHtml +
+                    '</div>';
+            }).join('');
+        }
+
+        function addToCart(id) {
+            var d = dishIndex[id];
+            if (!d) return;
+            var cart = [];
+            try { cart = JSON.parse(localStorage.getItem('cart')) || []; } catch {}
+            var existing = cart.find(function(i) { return i.name === d.name; });
+            if (existing) { existing.qty += 1; }
+            else { cart.push({ name: d.name, price: d.price, qty: 1 }); }
+            localStorage.setItem('cart', JSON.stringify(cart));
+            var toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(function() { toast.classList.remove('show'); }, 2000);
+        }
+
+        function escHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+        function escAttr(s) { return escHtml(s); }
+
+        updateNav();
+        renderMenu();
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,199 @@
+body {
+    background-color: #111;
+    color: white;
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+}
+
+.dish-img {
+    width: 72px;
+    height: 72px;
+    border-radius: 8px;
+    object-fit: cover;
+    flex-shrink: 0;
+    margin-right: 12px;
+}
+
+.dish-name {
+    font-size: 15px;
+    font-weight: 500;
+    color: white;
+}
+
+.dish-desc {
+    font-size: 13px;
+    color: #666;
+    margin-top: 2px;
+}
+
+.dish-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 0.5px solid rgba(255,255,255,0.07);
+}
+
+.dish-info {
+    flex: 1;
+}
+
+nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+   background: #2e2e2e;
+    border-bottom: 0.5px solid rgba(255,255,255,0.1);
+}
+
+
+nav h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: white;
+}
+
+
+.logo-big { color: white; }
+.logo-dream { color:  rgb(206, 116, 51); }
+
+nav a {
+    font-size: 13px;
+    color: #999;
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 8px;
+}
+
+nav a:hover {
+    background: #2a2a2a;
+    color: white;
+}
+
+nav a.active {
+    background: #2a2a2a;
+    color: white;
+    font-weight: 500;
+}
+
+.content {
+    padding: 0 24px 40px;
+}
+
+.section-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 28px 0 12px;
+}
+
+.section-label h2 {
+    font-size: 15px;
+    font-weight: 500;
+    color: white;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.section-label::after {
+    content: '';
+    flex: 1;
+    height: 0.5px;
+    background: rgba(255,255,255,0.1);
+}
+
+.subsection {
+    margin-bottom: 8px;
+}
+
+.subsection-title {
+    font-size: 11px;
+    font-weight: 500;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    padding: 12px 0 6px;
+}
+
+.dish-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 0.5px solid rgba(255,255,255,0.07);
+}
+
+.dish-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: white;
+}
+
+.dish-desc {
+    font-size: 12px;
+    color: #666;
+    margin-top: 2px;
+}
+
+.cart-btn {
+    width: 30px;
+    height: 30px;
+    border: 0.5px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    background: transparent;
+    cursor: pointer;
+    color: #999;
+    font-size: 16px;
+    flex-shrink: 0;
+    transition: background 0.15s;
+}
+
+.cart-btn:hover {
+    background: #2a2a2a;
+    color: white;
+}
+
+.dish-img {
+    transition: transform 0.3s ease;
+}
+
+.dish-row:hover .dish-img {
+    transform: scale(1.08);
+}
+
+.dish-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.dish-price {
+    font-size: 14px;
+    font-weight: 500;
+    color: rgb(206, 116, 51);
+    white-space: nowrap;
+}
+
+.toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: rgb(206, 116, 51);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    opacity: 0;
+    transition: transform 0.4s ease, opacity 0.4s ease;
+    z-index: 999;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}

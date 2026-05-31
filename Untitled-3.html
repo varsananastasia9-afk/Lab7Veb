@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Кошик</title>
+    <link rel="stylesheet" href="Untitled-3.css">
+</head>
+
+<body>
+
+    <nav>
+        <h2><span class="Big-logo">Big</span> <span class="Dream-logo">Dream</span></h2>
+        <div>
+            <a href="Untitled-1.html">Головна</a>
+            <a href="Untitled-2.html">Меню</a>
+            <a href="Untitled-3.html" class="active">Кошик</a>
+            <a href="Untitled-4.html">Вхід</a>
+        </div>
+    </nav>
+
+    <div class="content">
+        <h3>Кошик</h3>
+        <p>Додавайте страви з меню, щоб зробити замовлення</p>
+
+        <div id="empty-state" class="empty-state">
+            <div class="empty-icon">○</div>
+            <h4>Кошик порожній</h4>
+            <p>Оберіть страви з нашого меню і вони з'являться тут</p>
+            <a href="Untitled-2.html" class="go-btn">Перейти до меню</a>
+        </div>
+
+        <div id="cart-items" style="display:none">
+            <div id="items-list"></div>
+            <div class="total-block">
+                <div class="total-row">
+                    <span>Разом:</span>
+                    <span id="total-price" class="total-sum">0 грн</span>
+                </div>
+                <button class="order-btn" onclick="placeOrder()">Оформити замовлення</button>
+                <button class="clear-btn" onclick="clearCart()">Очистити кошик</button>
+            </div>
+        </div>
+
+        <div class="info-grid">
+            <div class="info-card">
+                <span class="info-label">Доставка</span>
+                <span class="info-value" id="info-address">По м. Південне</span>
+            </div>
+            <div class="info-card">
+                <span class="info-label">Час доставки</span>
+                <span class="info-value">30 – 45 хвилин</span>
+            </div>
+            <div class="info-card">
+                <span class="info-label">Оплата</span>
+                <span class="info-value">Готівка або картка</span>
+            </div>
+            <div class="info-card">
+                <span class="info-label">Телефон</span>
+                <span class="info-value" id="info-phone">+380 63 223 75 60</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function renderCart() {
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const emptyState = document.getElementById('empty-state');
+            const cartItems = document.getElementById('cart-items');
+            const itemsList = document.getElementById('items-list');
+
+            if (cart.length === 0) {
+                emptyState.style.display = 'flex';
+                cartItems.style.display = 'none';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            cartItems.style.display = 'block';
+
+            itemsList.innerHTML = '';
+            let total = 0;
+
+            cart.forEach(function(item) {
+                total += item.price * item.qty;
+                const row = document.createElement('div');
+                row.className = 'cart-item';
+                row.innerHTML =
+                    '<div class="cart-item-name">' + item.name + '</div>' +
+                    '<div class="cart-item-controls">' +
+                        '<button class="qty-btn" onclick="changeQty(\'' + item.name + '\', -1)">−</button>' +
+                        '<span class="qty-num">' + item.qty + '</span>' +
+                        '<button class="qty-btn" onclick="changeQty(\'' + item.name + '\', 1)">+</button>' +
+                        '<span class="cart-item-price">' + (item.price * item.qty) + ' грн</span>' +
+                    '</div>';
+                itemsList.appendChild(row);
+            });
+
+            document.getElementById('total-price').textContent = total + ' грн';
+        }
+
+        function changeQty(name, delta) {
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const item = cart.find(function(i) { return i.name === name; });
+            if (!item) return;
+            item.qty += delta;
+            if (item.qty <= 0) {
+                const index = cart.indexOf(item);
+                cart.splice(index, 1);
+            }
+            localStorage.setItem('cart', JSON.stringify(cart));
+            renderCart();
+        }
+
+        function clearCart() {
+            localStorage.removeItem('cart');
+            renderCart();
+        }
+
+        function placeOrder() {
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            if (cart.length === 0) return;
+
+            let total = 0;
+            cart.forEach(function(i) { total += i.price * i.qty; });
+            const orders = JSON.parse(localStorage.getItem('admin_orders') || '[]');
+            const newId = orders.length ? Math.max.apply(null, orders.map(function(o) { return o.id; })) + 1 : 1001;
+            orders.push({
+                id: newId,
+                items: cart.map(function(i) { return { name: i.name, price: i.price, qty: i.qty }; }),
+                total: total,
+                status: 'new',
+                date: new Date().toISOString()
+            });
+            localStorage.setItem('admin_orders', JSON.stringify(orders));
+
+            alert('Замовлення №' + newId + ' оформлено!\nСума: ' + total + ' грн.\nОчікуйте дзвінка.');
+            clearCart();
+        }
+
+        renderCart();
+
+        try {
+            var s = JSON.parse(localStorage.getItem('admin_settings'));
+            if (s) {
+                if (s.address) document.getElementById('info-address').textContent = 'По м. ' + s.address.split(',')[0].replace(/м\.\s*/,'');
+                if (s.phone)   document.getElementById('info-phone').textContent   = s.phone;
+            }
+        } catch(e) {}
+
+        const cards = document.querySelectorAll('.info-card');
+        cards.forEach(function(card, i) {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(16px)';
+            card.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+            setTimeout(function() {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 300 + i * 100);
+        });
+    </script>
+
+</body>
+</html>
